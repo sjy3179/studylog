@@ -10,8 +10,8 @@ import type {
 } from '@/runtime/runtime-types'
 
 function isFresh(nowMs: number, timestampMs: number, maxAgeMs: number): boolean {
-  const age = nowMs - timestampMs
-  return age >= 0 && age <= maxAgeMs
+  const age = Math.max(0, nowMs - timestampMs)
+  return age <= maxAgeMs
 }
 
 export class PostureFusionEngine {

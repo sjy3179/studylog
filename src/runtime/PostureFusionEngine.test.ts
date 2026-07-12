@@ -44,6 +44,10 @@ describe('PostureFusionEngine', () => {
     expect(fuse(tm(), media({ timestampMs: 400 }), 1_100).reasonCode).toBe('MEDIAPIPE_STALE')
   })
 
+  it('treats a slightly future rAF timestamp as age zero', () => {
+    expect(fuse(tm({ timestampMs: 1_101 }), media({ timestampMs: 1_101 }), 1_100).rawState).toBe('GOOD')
+  })
+
   it('prioritizes fresh pose absence over the last TM GOOD', () => {
     expect(fuse(tm(), media({ poseDetected: false }))).toMatchObject({ rawState: 'NO_POSE', reasonCode: 'NO_POSE' })
   })

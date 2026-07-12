@@ -24,8 +24,10 @@ export function RuntimeDebugPanel() {
           <dt className="text-muted-foreground">runtime</dt><dd>{snapshot?.runtimeReady ? 'READY' : snapshot?.blockingReason ?? 'WAITING'}</dd>
           <dt className="text-muted-foreground">TM</dt><dd>{snapshot?.fusedObservation?.tmLabel ?? '-'} · {snapshot?.fusedObservation?.tmConfidence !== null && snapshot?.fusedObservation?.tmConfidence !== undefined ? `${Math.round(snapshot.fusedObservation.tmConfidence * 100)}%` : '-'}</dd>
           <dt className="text-muted-foreground">MediaPipe</dt><dd>{snapshot?.fusedObservation ? String(snapshot.fusedObservation.poseDetected) : '-'}</dd>
+          <dt className="text-muted-foreground">freshness</dt><dd>{snapshot?.fusedObservation ? `MP ${snapshot.fusedObservation.mediaPipeFresh} · TM ${snapshot.fusedObservation.tmFresh}` : '-'}</dd>
           <dt className="text-muted-foreground">deviation</dt><dd>{snapshot?.fusedObservation?.deviationScore?.toFixed(3) ?? '-'}</dd>
           <dt className="text-muted-foreground">raw</dt><dd>{snapshot?.fusedObservation?.rawState ?? '-'}</dd>
+          <dt className="text-muted-foreground">reason</dt><dd>{snapshot?.fusedObservation?.reasonCode ?? '-'}</dd>
           <dt className="text-muted-foreground">history</dt><dd className="break-words">{snapshot?.stablePosture.history.map((item) => item.rawState).join(' · ') || '-'}</dd>
           <dt className="text-muted-foreground">consensus</dt><dd>{snapshot?.stablePosture.consensusCount ?? 0} / 8</dd>
           <dt className="text-muted-foreground">candidate</dt><dd>{snapshot?.stablePosture.candidateState ?? '-'} · {Math.round(snapshot?.stablePosture.candidateDurationMs ?? 0)}ms</dd>
