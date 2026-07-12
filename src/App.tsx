@@ -24,9 +24,9 @@ const EvaluationPage = lazy(() =>
     default: module.EvaluationPage,
   })),
 )
-const ReportPlaceholderPage = lazy(() =>
-  import('@/pages/report/ReportPlaceholderPage').then((module) => ({
-    default: module.ReportPlaceholderPage,
+const ReportPage = lazy(() =>
+  import('@/pages/report/ReportPage').then((module) => ({
+    default: module.ReportPage,
   })),
 )
 const NotFoundPage = lazy(() =>
@@ -56,7 +56,7 @@ export function App() {
           <Route element={<SettingsPage />} path="settings" />
         </Route>
         <Route element={<EvaluationPage />} path="/evaluate" />
-        <Route element={<ReportPlaceholderPage />} path="/report/:sessionId" />
+        <Route element={<ReportPage />} path="/report/:sessionId" />
         <Route element={<NotFoundPage />} path="*" />
       </Routes>
     </Suspense>
