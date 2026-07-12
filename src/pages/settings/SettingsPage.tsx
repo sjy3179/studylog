@@ -12,6 +12,7 @@ import {
   Timer,
 } from 'lucide-react'
 
+import { CameraPanel } from '@/components/camera/CameraPanel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -71,6 +72,13 @@ export function SettingsPage() {
     (state) => state.setTimerVisibility,
   )
   const timerVisibility = useStudySettingsStore((state) => state.timerVisibility)
+  const mirrorCamera = useStudySettingsStore((state) => state.mirrorCamera)
+  const selectedCameraDeviceId = useStudySettingsStore((state) => state.selectedCameraDeviceId)
+  const setMirrorCamera = useStudySettingsStore((state) => state.setMirrorCamera)
+  const setShowCameraPreview = useStudySettingsStore((state) => state.setShowCameraPreview)
+  const setShowPoseOverlay = useStudySettingsStore((state) => state.setShowPoseOverlay)
+  const showCameraPreview = useStudySettingsStore((state) => state.showCameraPreview)
+  const showPoseOverlay = useStudySettingsStore((state) => state.showPoseOverlay)
   const resetSession = useStudySessionStore((state) => state.resetSession)
 
   return (
@@ -82,7 +90,7 @@ export function SettingsPage() {
         </div>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">설정</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          순공 시간 표시 방식과 Phase 1 Mock 동작을 내 브라우저에서 관리합니다.
+          순공 시간 표시와 로컬 카메라·MediaPipe 설정을 이 브라우저에서 관리합니다.
         </p>
       </header>
 
@@ -167,25 +175,46 @@ export function SettingsPage() {
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-base">카메라</CardTitle>
-                <Badge variant="outline">Phase 2 예정</Badge>
+                <Badge variant="outline">브라우저 로컬 설정</Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                {['카메라 미리보기', 'MediaPipe 관절 오버레이', '좌우 반전', '카메라 장치 선택'].map((item) => (
-                  <div className="flex items-center justify-between rounded-xl border bg-muted/25 px-4 py-3" key={item}>
-                    <span className="text-sm text-muted-foreground">{item}</span>
-                    <Switch aria-label={`${item} — Phase 2 예정`} disabled />
-                  </div>
-                ))}
+            <CardContent className="divide-y">
+              <SettingRow
+                checked={showCameraPreview}
+                description="카메라가 켜져 있을 때 원본 미리보기 표시 여부를 바꿉니다. 분석 입력은 저장되지 않습니다."
+                id="settings-camera-preview"
+                label="카메라 미리보기 표시"
+                onCheckedChange={setShowCameraPreview}
+              />
+              <SettingRow
+                checked={showPoseOverlay}
+                description="MediaPipe가 찾은 관절점과 연결선을 미리보기 위에 표시합니다."
+                id="settings-pose-overlay"
+                label="MediaPipe 관절 오버레이"
+                onCheckedChange={setShowPoseOverlay}
+              />
+              <SettingRow
+                checked={mirrorCamera}
+                description="video와 overlay를 함께 좌우반전합니다. 분석 좌표와 기준값은 뒤집지 않습니다."
+                id="settings-camera-mirror"
+                label="카메라 좌우반전"
+                onCheckedChange={setMirrorCamera}
+              />
+              <div className="flex min-h-16 flex-col justify-center gap-1 py-3">
+                <p className="text-sm font-medium">선택 카메라 장치</p>
+                <p className="break-all font-mono text-xs text-muted-foreground">
+                  {selectedCameraDeviceId ?? '카메라 권한 승인 후 선택할 수 있습니다.'}
+                </p>
               </div>
               <Alert>
                 <Info aria-hidden="true" />
-                <AlertTitle>Phase 1에서는 카메라 권한을 요청하지 않습니다.</AlertTitle>
-                <AlertDescription>현재 화면은 MockPostureClassifier만 사용합니다.</AlertDescription>
+                <AlertTitle>카메라를 켜기 전에는 권한을 요청하지 않습니다.</AlertTitle>
+                <AlertDescription>아래 미리보기에서 장치를 선택하고 실제 overlay와 캘리브레이션을 확인할 수 있습니다.</AlertDescription>
               </Alert>
             </CardContent>
           </Card>
+
+          <CameraPanel />
 
           <Card>
             <CardHeader>

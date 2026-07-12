@@ -1,0 +1,26 @@
+import type { CameraStatus } from '@/camera/camera-types'
+
+export type CameraEvent =
+  | 'START_REQUESTED'
+  | 'PERMISSION_GRANTED'
+  | 'READY'
+  | 'STOP_REQUESTED'
+  | 'STOPPED'
+  | 'FAILED'
+
+const TRANSITIONS: Record<CameraStatus, Partial<Record<CameraEvent, CameraStatus>>> = {
+  IDLE: { START_REQUESTED: 'REQUESTING_PERMISSION', STOP_REQUESTED: 'STOPPING' },
+  REQUESTING_PERMISSION: { PERMISSION_GRANTED: 'STARTING', FAILED: 'ERROR', STOP_REQUESTED: 'STOPPING' },
+  STARTING: { READY: 'READY', FAILED: 'ERROR', STOP_REQUESTED: 'STOPPING' },
+  READY: { STOP_REQUESTED: 'STOPPING', FAILED: 'ERROR' },
+  STOPPING: { PERMISSION_GRANTED: 'STARTING', STOPPED: 'STOPPED', FAILED: 'ERROR' },
+  STOPPED: { START_REQUESTED: 'REQUESTING_PERMISSION', STOP_REQUESTED: 'STOPPING' },
+  ERROR: { START_REQUESTED: 'REQUESTING_PERMISSION', STOP_REQUESTED: 'STOPPING' },
+}
+
+export function transitionCameraStatus(
+  status: CameraStatus,
+  event: CameraEvent,
+): CameraStatus {
+  return TRANSITIONS[status][event] ?? status
+}
