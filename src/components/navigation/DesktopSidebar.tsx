@@ -53,7 +53,7 @@ export function DesktopSidebar() {
             </Tooltip>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            파일럿 AI 원시 예측 · Mock 타이머
+            파일럿 AI 융합 · 안정화 타이머
           </p>
         </div>
       </div>

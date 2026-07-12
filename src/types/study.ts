@@ -61,6 +61,7 @@ export interface SessionDurations {
   postureCautionMs: number;
   awayMs: number;
   luxCautionMs: number;
+  checkingMs: number;
 }
 
 export interface TimerVisibilitySettings {
@@ -78,6 +79,7 @@ export const EMPTY_SESSION_DURATIONS: Readonly<SessionDurations> = {
   postureCautionMs: 0,
   awayMs: 0,
   luxCautionMs: 0,
+  checkingMs: 0,
 };
 
 export const DEFAULT_TIMER_VISIBILITY_SETTINGS: Readonly<TimerVisibilitySettings> = {

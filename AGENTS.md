@@ -9,13 +9,13 @@
 - 화면 컴포넌트와 자세 분류, 센서, 상태 머신, 타이머, 저장 로직의 책임을 분리한다.
 - 각 Phase 완료 시 `npm run lint`, `npm run test`, `npm run build`를 모두 실행하고 결과와 남은 TODO를 보고한다.
 
-## Phase 2·3 경계
+## Phase 2~4 경계
 
 - 카메라 권한은 사용자가 버튼을 누른 뒤에만 요청하며 `CameraManager`가 한 번에 `MediaStream` 하나만 관리한다.
 - MediaPipe Pose Landmarker Lite는 `/mediapipe/wasm`과 `/models/mediapipe/pose_landmarker_lite.task`의 로컬 자산만 사용한다.
 - video·overlay 좌우반전은 표시용 transform 하나로 관리한다. 추론·캘리브레이션 좌표를 다시 뒤집지 않는다.
 - 원본 MediaPipe result와 매 프레임 landmark 배열을 Zustand, localStorage, IndexedDB에 저장하지 않는다.
-- MediaPipe의 사람 감지·편차는 화면 정보, 캘리브레이션, 디버그에만 사용한다. `setPosture`, `StudyStateMachine`, `SessionTimer`에 연결하지 않는다.
+- Phase 4에서는 MediaPipe의 사람 감지·편차와 TM Pose 결과를 freshness 검증·융합·안정화한 뒤에만 실제 타이머 조건에 사용한다.
 - 기존 `MockPostureClassifier`와 `MockLuxProvider`, Mock GOOD/BAD/AWAY 타이머 제어는 유지한다.
 - Teachable Machine Pose 원시 추론은 Phase 3에서만 사용한다. MediaPipe/TM 융합, 실제 카메라 기반 GOOD/BAD/AWAY, 자동 타이머 제어는 Phase 4 전까지 구현하지 않는다.
 - WASM 파일은 `scripts/sync-mediapipe-assets.mjs`와 `postinstall`로 패키지에서 이름 그대로 동기화한다.
@@ -28,7 +28,7 @@
 - TM은 기존 `CameraManager`의 동일 video element만 사용한다. `tmPose.Webcam`과 추가 `getUserMedia` 호출을 금지한다.
 - TM 입력은 재사용 257px canvas의 중앙 정사각형 crop이다. mirror는 draw 단계에서 한 번만 적용하고 `estimatePose(canvas, false)`를 호출한다.
 - MediaPipe는 약 6~8Hz, TM Pose는 기본 2.5Hz로 제한하고 공용 추론 coordinator, in-flight guard, hidden/OFF/unmount cleanup을 유지한다.
-- TM 확률·최고 클래스·오류·성능은 원시 정보 UI에만 둔다. TM 결과를 Mock store, `setPosture`, `StudyStateMachine`, `SessionTimer`에 연결하지 않는다.
+- TM 원시 확률 하나를 직접 타이머에 연결하지 않는다. Phase 4 융합·12개 중 8개 합의·지속시간을 통과한 안정 상태만 사용한다.
 - 로그인, 인증, 백엔드, API, 서버 함수, 데이터베이스, Supabase, Firebase, WebSocket, 환경 변수 기반 연동을 구현하지 않는다.
 - 그룹 페이지는 소스 코드의 정적 더미 데이터만 사용한다. 네트워크 요청은 금지하며 생성·초대·참가·복사·설정 액션은 모두 비활성화한다.
 
@@ -46,4 +46,4 @@
 - 실제 집중력 측정, 의료 진단, 거북목·척추 진단, 시력 보호 보장, 완전한 자세 인식으로 표현하지 않는다.
 - 관찰 가능한 자세 분류와 설정 조건 충족 시간임을 명확히 하고 환경에 따라 오분류될 수 있음을 안내한다.
 
-Phase 3 완료 보고 후 멈추며 Phase 4 결과 융합·안정화·자동 타이머 제어를 시작하지 않는다.
+Phase 4 완료 보고 후 멈추며 Phase 5 저장·리포트·CSV 작업을 시작하지 않는다.

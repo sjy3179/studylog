@@ -56,6 +56,26 @@ describe("SessionTimer", () => {
     });
   });
 
+  it("records UNKNOWN as checking without treating it as seated", () => {
+    const timer = new SessionTimer();
+
+    const durations = timer.advanceBy(500, sample({ posture: "UNKNOWN" }));
+
+    expect(durations).toMatchObject({
+      totalSessionMs: 500,
+      seatedMs: 0,
+      checkingMs: 500,
+      effectiveStudyMs: 0,
+    });
+  });
+
+  it("clamps a single monotonic tick delta to two seconds", () => {
+    const timer = new SessionTimer();
+    timer.tick(0, sample());
+
+    expect(timer.tick(10_000, sample()).totalSessionMs).toBe(2_000);
+  });
+
   it("records overlapping posture and lux caution details", () => {
     const timer = new SessionTimer();
 

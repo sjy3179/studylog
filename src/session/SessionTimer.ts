@@ -19,6 +19,7 @@ function assertNonNegativeFinite(value: number, name: string): void {
  * directly when the caller already computed the elapsed duration.
  */
 export class SessionTimer {
+  static readonly MAX_TICK_DELTA_MS = 2_000;
   private durations: SessionDurations = copyDurations(EMPTY_SESSION_DURATIONS);
   private lastNowMs: number | null = null;
 
@@ -34,7 +35,10 @@ export class SessionTimer {
       throw new RangeError("nowMs must be monotonic.");
     }
 
-    const deltaMs = nowMs - this.lastNowMs;
+    const deltaMs = Math.min(
+      nowMs - this.lastNowMs,
+      SessionTimer.MAX_TICK_DELTA_MS,
+    );
     this.lastNowMs = nowMs;
     return this.advanceBy(deltaMs, sample);
   }
@@ -51,9 +55,13 @@ export class SessionTimer {
 
     this.durations.totalSessionMs += deltaMs;
 
-    const isSeated = sample.posture !== "AWAY";
-    if (!isSeated) {
+    if (sample.posture === "AWAY") {
       this.durations.awayMs += deltaMs;
+      return this.getDurations();
+    }
+
+    if (sample.posture === "UNKNOWN") {
+      this.durations.checkingMs += deltaMs;
       return this.getDurations();
     }
 

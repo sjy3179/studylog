@@ -9,12 +9,15 @@ import {
 } from '@/ai/calibration-storage'
 import type { CalibrationProfile } from '@/ai/pose-types'
 import { MockLuxProvider } from '@/sensors/MockLuxProvider'
+import type { RuntimeControlMode, RuntimeSnapshot } from '@/runtime/runtime-types'
 import {
   DEFAULT_TIMER_VISIBILITY_SETTINGS,
   EMPTY_SESSION_DURATIONS,
   type MockPostureState,
+  type LuxStatus,
   type SessionDurations,
   type SessionLifecycle,
+  type StablePostureState,
   type TimerVisibilitySettings,
 } from '@/types/study'
 
@@ -49,16 +52,23 @@ interface CalibrationState {
 }
 
 interface StudySessionState {
+  controlMode: RuntimeControlMode
   durations: SessionDurations
   lifecycle: SessionLifecycle
   lux: number
-  posture: MockPostureState
+  mockPosture: MockPostureState
+  posture: StablePostureState
+  stableLuxStatus: LuxStatus
+  runtimeSnapshot: RuntimeSnapshot | null
+  runtimeRevision: number
   sessionRevision: number
+  applyRuntimeSnapshot: (snapshot: RuntimeSnapshot) => void
   finishSession: () => void
   pauseSession: () => void
   resetSession: () => void
   setLux: (value: number) => void
   setPosture: (value: MockPostureState) => void
+  setControlMode: (mode: RuntimeControlMode) => void
   startSession: () => void
   updateDurations: (durations: Readonly<SessionDurations>) => void
 }
@@ -140,11 +150,27 @@ export const useCalibrationStore = create<CalibrationState>((set) => ({
 }))
 
 export const useStudySessionStore = create<StudySessionState>((set) => ({
+  controlMode: 'MOCK',
   durations: createEmptyDurations(),
   lifecycle: 'IDLE',
   lux: luxProvider.getLux(),
+  mockPosture: postureClassifier.getState(),
   posture: postureClassifier.getState(),
+  stableLuxStatus: 'RECOMMENDED',
+  runtimeSnapshot: null,
+  runtimeRevision: 0,
   sessionRevision: 0,
+  applyRuntimeSnapshot: (snapshot) => {
+    set((state) =>
+      snapshot.mode === state.controlMode
+        ? {
+            posture: snapshot.timerPosture,
+            stableLuxStatus: snapshot.stableLux.status,
+            runtimeSnapshot: snapshot,
+          }
+        : state,
+    )
+  },
   finishSession: () => {
     set((state) => ({
       lifecycle:
@@ -162,6 +188,8 @@ export const useStudySessionStore = create<StudySessionState>((set) => ({
     set((state) => ({
       durations: createEmptyDurations(),
       lifecycle: 'IDLE',
+      runtimeSnapshot: null,
+      runtimeRevision: state.runtimeRevision + 1,
       sessionRevision: state.sessionRevision + 1,
     }))
   },
@@ -171,7 +199,21 @@ export const useStudySessionStore = create<StudySessionState>((set) => ({
   },
   setPosture: (value) => {
     postureClassifier.setState(value)
-    set({ posture: postureClassifier.getState() })
+    set((state) => ({
+      mockPosture: postureClassifier.getState(),
+      posture: state.controlMode === 'MOCK' ? postureClassifier.getState() : state.posture,
+    }))
+  },
+  setControlMode: (mode) => {
+    set((state) => {
+      if (state.controlMode === mode) return state
+      return {
+        controlMode: mode,
+        posture: mode === 'MOCK' ? state.mockPosture : 'UNKNOWN',
+        runtimeSnapshot: null,
+        runtimeRevision: state.runtimeRevision + 1,
+      }
+    })
   },
   startSession: () => {
     set((state) => {
