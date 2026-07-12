@@ -1,6 +1,6 @@
 # studylog
 
-주영이네 팀 도와주려고 시작한 Teachable Machine 웹앱 프로젝트 studylog
+Teachable Machine 웹앱 프로젝트 studylog
 
 공부한 시간뿐 아니라 착석·자세·조도 조건을 함께 기록하는 개인용 캠스터디 웹 앱입니다. Phase 2에서는 브라우저 웹캠과 MediaPipe Pose Landmarker Lite로 관절 오버레이, 사람 존재 원시 표시, 기준 자세 캘리브레이션과 상대 편차를 제공합니다.
 
