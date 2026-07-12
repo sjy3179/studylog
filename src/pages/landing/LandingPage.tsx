@@ -20,6 +20,7 @@ import {
 import { Link } from 'react-router-dom'
 
 import { BrandMark } from '@/components/brand/BrandMark'
+import { LandingIntro } from '@/components/landing/LandingIntro'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -191,6 +192,7 @@ function ProductPreview() {
 export function LandingPage() {
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#f8fafc] text-left text-slate-950 [color-scheme:light]">
+      <LandingIntro />
       <a
         href="#main-content"
         className="sr-only z-50 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-indigo-700 shadow-lg focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
