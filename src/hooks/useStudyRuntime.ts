@@ -5,6 +5,7 @@ import type { PoseRuntimeSnapshot } from '@/ai/pose-types'
 import type { TmPoseRuntimeSnapshot } from '@/ai/tm-pose/tm-pose-types'
 import type { CameraStatus } from '@/camera/camera-types'
 import { RUNTIME_TICK_MS } from '@/runtime/runtime-config'
+import { recordSignalReceipt, type SignalReceiptState } from '@/runtime/SignalReceiptClock'
 import { StudyRuntimeController } from '@/runtime/StudyRuntimeController'
 import type { MediaPipePostureSignal, TmPoseSignal } from '@/runtime/runtime-types'
 import { useStudySessionStore, useStudySettingsStore } from '@/stores/useStudyStore'
@@ -18,6 +19,7 @@ interface UseStudyRuntimeOptions {
 export function useStudyRuntime(options: UseStudyRuntimeOptions): void {
   const optionsRef = useRef(options)
   const controllerRef = useRef(new StudyRuntimeController())
+  const mediaPipeReceiptRef = useRef<SignalReceiptState>({ sourceTimestampMs: null, receivedAtMs: null })
   const sessionRevision = useStudySessionStore((state) => state.sessionRevision)
   const runtimeRevision = useStudySessionStore((state) => state.runtimeRevision)
 
@@ -35,6 +37,11 @@ export function useStudyRuntime(options: UseStudyRuntimeOptions): void {
       const current = optionsRef.current
       const session = useStudySessionStore.getState()
       const settings = useStudySettingsStore.getState()
+      mediaPipeReceiptRef.current = recordSignalReceipt(
+        mediaPipeReceiptRef.current,
+        current.poseSnapshot.latestFrame?.timestampMs ?? null,
+        nowMs,
+      )
       const result = controllerRef.current.tick({
         nowMs,
         mode: session.controlMode,
@@ -43,7 +50,10 @@ export function useStudyRuntime(options: UseStudyRuntimeOptions): void {
         countLuxInEffectiveTime: settings.countLuxInEffectiveTime,
         mockPosture: session.mockPosture,
         tmPrediction: toTmSignal(current.tmSnapshot),
-        mediaPipeSignal: toMediaPipeSignal(current.poseSnapshot),
+        mediaPipeSignal: toMediaPipeSignal(
+          current.poseSnapshot,
+          mediaPipeReceiptRef.current.receivedAtMs,
+        ),
         cameraReady: current.cameraStatus === 'READY',
         cameraError: current.cameraStatus === 'ERROR' || Boolean(current.poseSnapshot.error),
         mediaPipeReady: ['READY', 'RUNNING', 'PAUSED'].includes(current.poseSnapshot.engineStatus),
@@ -80,11 +90,14 @@ function toTmSignal(snapshot: TmPoseRuntimeSnapshot): TmPoseSignal | null {
   }
 }
 
-function toMediaPipeSignal(snapshot: PoseRuntimeSnapshot): MediaPipePostureSignal | null {
+function toMediaPipeSignal(
+  snapshot: PoseRuntimeSnapshot,
+  receivedAtMs: number | null,
+): MediaPipePostureSignal | null {
   const frame = snapshot.latestFrame
-  if (!frame) return null
+  if (!frame || receivedAtMs === null) return null
   return {
-    timestampMs: frame.timestampMs,
+    timestampMs: receivedAtMs,
     poseDetected: frame.detected,
     deviationScore: snapshot.deviation?.score ?? null,
     deviationReasons: snapshot.deviation?.reasons ?? [],
