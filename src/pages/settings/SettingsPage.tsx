@@ -95,7 +95,7 @@ export function SettingsPage() {
       </header>
 
       <Tabs defaultValue="timer">
-        <TabsList className="grid h-auto w-full grid-cols-3 p-1 sm:w-auto sm:min-w-[460px]">
+        <TabsList className="grid h-12! w-full grid-cols-3 p-1 sm:w-auto sm:min-w-[460px]">
           <TabsTrigger className="min-h-10 gap-2" value="timer">
             <Timer aria-hidden="true" className="hidden size-4 sm:block" />
             타이머

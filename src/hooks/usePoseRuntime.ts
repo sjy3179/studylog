@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { toast } from 'sonner'
 
 import { CalibrationManager } from '@/ai/CalibrationManager'
+import { browserAiInferenceCoordinator } from '@/ai/BrowserAiInferenceCoordinator'
 import { MediaPipePoseEngine } from '@/ai/MediaPipePoseEngine'
 import { PoseFeatureExtractor } from '@/ai/PoseFeatureExtractor'
 import { PostureDeviationAnalyzer } from '@/ai/PostureDeviationAnalyzer'
@@ -204,6 +205,8 @@ export function usePoseRuntime({
         return
       }
 
+      if (!browserAiInferenceCoordinator.tryAcquire('MEDIAPIPE')) return
+
       inferenceInFlight = true
       lastInferenceAt = now
       lastVideoTime = video.currentTime
@@ -260,6 +263,7 @@ export function usePoseRuntime({
         cancelAnimationFrame(animationFrameId)
       } finally {
         inferenceInFlight = false
+        browserAiInferenceCoordinator.release('MEDIAPIPE')
       }
     }
 

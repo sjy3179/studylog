@@ -53,7 +53,7 @@ export function DesktopSidebar() {
             </Tooltip>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            실제 AI 모델은 Phase 3에서 연결할 예정입니다.
+            파일럿 AI 원시 예측 · Mock 타이머
           </p>
         </div>
       </div>

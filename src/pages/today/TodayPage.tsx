@@ -180,7 +180,7 @@ export function TodayPage() {
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Badge variant="secondary">Phase 2</Badge>
+            <Badge variant="secondary">Phase 3</Badge>
             <Badge className="gap-1.5" variant="outline">
               <Sparkles aria-hidden="true" className="size-3.5 text-primary" />
               Mock 센서

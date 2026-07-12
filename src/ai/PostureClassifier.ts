@@ -1,14 +1,14 @@
-import type { StablePostureState } from "@/types/study";
+export interface PostureClassifierInput {
+  mirrorCamera: boolean
+  timestampMs: number
+  video: HTMLVideoElement
+}
 
-export type PostureClassifierInput = HTMLVideoElement | HTMLCanvasElement;
-
-/**
- * Replaceable posture source used by the app. The Phase 1 mock ignores the
- * optional image input; a later camera-backed implementation can use it.
- */
-export interface PostureClassifier {
-  initialize(): Promise<void>;
-  predict(input?: PostureClassifierInput): Promise<StablePostureState>;
-  getState(): StablePostureState;
-  dispose(): void;
+/** Shared lifecycle contract for the deterministic Mock and browser AI adapters. */
+export interface PostureClassifier<TInput, TResult, TStatus, TModelInfo> {
+  initialize(): Promise<void>
+  predict(input: TInput): Promise<TResult>
+  getStatus(): TStatus
+  getModelInfo(): TModelInfo | null
+  dispose(): Promise<void> | void
 }
