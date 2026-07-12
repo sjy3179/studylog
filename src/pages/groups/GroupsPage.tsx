@@ -288,7 +288,7 @@ export function GroupsPage() {
                     <CardTitle id="weekly-ranking-title" className="text-base font-semibold">
                       주간 랭킹
                     </CardTitle>
-                    <CardDescription className="mt-1">정적 UI 데모 순공 시간 기준</CardDescription>
+                    <CardDescription className="mt-1">순공 시간 기준</CardDescription>
                   </div>
                   <span className="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
                     <Trophy aria-hidden="true" className="size-5" />

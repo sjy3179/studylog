@@ -502,9 +502,46 @@ export function LandingPage() {
           className="scroll-mt-20 border-y border-slate-200 bg-indigo-50/50 py-20 sm:py-24"
           aria-labelledby="privacy-title"
         >
-          <div className={`${pageWidth} grid items-center gap-10 lg:grid-cols-[0.7fr_1.3fr]`}>
-            <div className="flex size-16 items-center justify-center rounded-2xl bg-white text-indigo-700 shadow-sm ring-1 ring-indigo-100">
-              <ShieldCheck aria-hidden="true" className="size-8" />
+          <div className={`${pageWidth} grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16`}>
+            <div className="relative mx-auto w-full max-w-md" aria-hidden="true">
+              <div className="absolute -inset-8 rounded-full bg-indigo-200/35 blur-3xl" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-indigo-100 bg-white/90 p-5 shadow-[0_24px_70px_-36px_rgba(67,56,202,0.45)] backdrop-blur sm:p-6">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-sm">
+                      <ShieldCheck className="size-6" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-950">브라우저 안에서 처리</p>
+                      <p className="mt-0.5 text-xs text-slate-500">카메라 프레임은 기기 밖으로 나가지 않아요</p>
+                    </div>
+                  </div>
+                  <span className="size-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />
+                </div>
+
+                <div className="my-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                  <div className="rounded-2xl bg-slate-50 p-4 text-center ring-1 ring-slate-200/80">
+                    <Camera className="mx-auto size-6 text-slate-500" />
+                    <p className="mt-2 text-xs font-semibold text-slate-700">실시간 입력</p>
+                  </div>
+                  <ArrowRight className="size-4 text-indigo-400" />
+                  <div className="rounded-2xl bg-indigo-50 p-4 text-center ring-1 ring-indigo-100">
+                    <ScanLine className="mx-auto size-6 text-indigo-600" />
+                    <p className="mt-2 text-xs font-semibold text-indigo-900">순간 분석</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-3.5 py-3 text-xs font-medium text-slate-600">
+                    <EyeOff className="size-4 text-indigo-600" />
+                    원본 영상·이미지 저장 안 함
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-3.5 py-3 text-xs font-medium text-slate-600">
+                    <LockKeyhole className="size-4 text-indigo-600" />
+                    서버 전송 없이 로컬에서 완료
+                  </div>
+                </div>
+              </div>
             </div>
             <div>
               <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-indigo-700 uppercase">
@@ -542,7 +579,7 @@ export function LandingPage() {
               <SectionHeading
                 id="group-preview-title"
                 eyebrow="Group preview"
-                description="각자의 학습 화면은 분리한 채, 함께 공부하는 흐름을 보여주는 정적 UI 데모입니다."
+                description="각자의 학습 화면은 분리한 채, 함께 공부하는 흐름을 보여줍니다."
               >
                 나란히 공부하는 감각만 담은 그룹
               </SectionHeading>
@@ -558,13 +595,13 @@ export function LandingPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-lg font-semibold tracking-[-0.02em] text-slate-950">시험기간 집중반</h3>
-                      <Badge className="border border-indigo-100 bg-indigo-50 text-indigo-700">UI 데모</Badge>
+                      <Badge className="border border-indigo-100 bg-indigo-50 text-indigo-700">미리보기</Badge>
                     </div>
-                    <p className="mt-2 text-sm text-slate-500">각자의 목표를 향해 공부하는 UI 데모 그룹입니다.</p>
+                    <p className="mt-2 text-sm text-slate-500">각자의 목표를 향해 함께 공부하는 그룹입니다.</p>
                   </div>
                   <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
                     <Users aria-hidden="true" className="size-4 text-indigo-600" />
-                    정적 멤버 미리보기
+                    그룹 멤버 미리보기
                   </div>
                 </div>
 
