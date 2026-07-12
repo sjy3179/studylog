@@ -191,7 +191,7 @@ export function GroupsPage() {
                     <div>
                       <h2 className="text-base font-semibold text-foreground">그룹 액션</h2>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Phase 1에서는 화면만 제공하며 실제 동작은 하지 않습니다.
+                        현재 화면은 UI 데모이며 실제 그룹 동작은 제공하지 않습니다.
                       </p>
                     </div>
                     <Badge variant="outline">추후 지원 예정</Badge>

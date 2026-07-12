@@ -41,7 +41,7 @@ export function DesktopSidebar() {
           <div className="flex items-center justify-between gap-2">
             <Badge className="gap-1.5" variant="secondary">
               <Sparkles aria-hidden="true" className="size-3.5" />
-              Mock mode
+              Demo mode
             </Badge>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -49,11 +49,11 @@ export function DesktopSidebar() {
                   <Info aria-hidden="true" className="size-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right">카메라 없이 Phase 1 동작을 확인합니다.</TooltipContent>
+              <TooltipContent side="right">카메라 없이 데모 센서 동작을 확인합니다.</TooltipContent>
             </Tooltip>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            파일럿 AI 융합 · 안정화 타이머
+            AI 융합 · 안정화 타이머
           </p>
         </div>
       </div>

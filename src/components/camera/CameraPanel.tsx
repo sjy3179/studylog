@@ -75,6 +75,9 @@ export function CameraPanel({ onTmSnapshot }: CameraPanelProps = {}) {
   const tmRuntime = useTeachableMachinePose({
     cameraStatus,
     mirrorCamera,
+    pauseInference: ['COUNTDOWN', 'COLLECTING', 'PROCESSING'].includes(
+      runtime.calibrationUi.status,
+    ),
     videoRef,
   })
   useStudyRuntime({
@@ -113,7 +116,7 @@ export function CameraPanel({ onTmSnapshot }: CameraPanelProps = {}) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base">실시간 자세 분석</CardTitle>
-            <Badge variant="secondary">Phase 4</Badge>
+            <Badge variant="secondary">AI 런타임</Badge>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">카메라 {cameraStatus}</Badge>

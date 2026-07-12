@@ -205,7 +205,7 @@ export function TodayPage() {
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Badge variant="secondary">Phase 4</Badge>
+            <Badge variant="secondary">통합 런타임</Badge>
             <Badge className="gap-1.5" variant="outline">
               <Sparkles aria-hidden="true" className="size-3.5 text-primary" />
               {controlMode === 'AI' ? 'AI 제어' : '데모 제어'}

@@ -1,5 +1,5 @@
 ﻿schema_version,evaluation_id,created_at_iso,participant_code,actual_label,predicted_label,correct,average_confidence,average_good_probability,average_forward_probability,average_side_probability,average_resting_probability,valid_sample_count,rejected_sample_count,collection_duration_ms,model_version,mirror_camera,lighting_condition,camera_distance,environment_note
-1,e1,2026-07-13T02:00:00Z,P01,GOOD_POSTURE,SIDE_LEAN,false,0.8,0.1,0.05,0.8,0.05,7,0,3000,pilot-v2,true,NORMAL,NORMAL,synthetic
-1,e2,2026-07-13T02:01:00Z,P01,FORWARD_LEAN,FORWARD_LEAN,true,0.9,0.02,0.9,0.04,0.04,7,0,3000,pilot-v2,true,DIM,NEAR,synthetic
-1,e3,2026-07-13T02:02:00Z,P02,SIDE_LEAN,SIDE_LEAN,true,0.85,0.03,0.05,0.85,0.03,7,0,3000,pilot-v2,false,BRIGHT,FAR,synthetic
-1,e4,2026-07-13T02:03:00Z,P02,RESTING,RESTING,true,0.95,0.01,0.01,0.03,0.95,7,0,3000,pilot-v2,false,NORMAL,NORMAL,synthetic
+1,e1,2026-07-13T02:00:00Z,P01,GOOD_POSTURE,SIDE_LEAN,false,0.8,0.1,0.05,0.8,0.05,7,0,3000,final-v1,true,NORMAL,NORMAL,synthetic
+1,e2,2026-07-13T02:01:00Z,P01,FORWARD_LEAN,FORWARD_LEAN,true,0.9,0.02,0.9,0.04,0.04,7,0,3000,final-v1,true,DIM,NEAR,synthetic
+1,e3,2026-07-13T02:02:00Z,P02,SIDE_LEAN,SIDE_LEAN,true,0.85,0.03,0.05,0.85,0.03,7,0,3000,final-v1,false,BRIGHT,FAR,synthetic
+1,e4,2026-07-13T02:03:00Z,P02,RESTING,RESTING,true,0.95,0.01,0.01,0.03,0.95,7,0,3000,final-v1,false,NORMAL,NORMAL,synthetic

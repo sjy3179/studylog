@@ -14,7 +14,7 @@ export function RuntimeDebugPanel() {
     <Collapsible onOpenChange={setOpen} open={open}>
       <CollapsibleTrigger asChild>
         <Button className="min-h-11 w-full justify-between" variant="outline">
-          <span className="flex items-center gap-2"><Bug aria-hidden="true" className="size-4" />Phase 4 런타임 디버그</span>
+          <span className="flex items-center gap-2"><Bug aria-hidden="true" className="size-4" />AI 런타임 디버그</span>
           <ChevronDown aria-hidden="true" className={`size-4 transition-transform ${open ? 'rotate-180' : ''}`} />
         </Button>
       </CollapsibleTrigger>

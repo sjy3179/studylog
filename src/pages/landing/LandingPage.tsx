@@ -609,7 +609,7 @@ export function LandingPage() {
               상태와 함께 남겨보세요.
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-indigo-100">
-              설치나 로그인 없이 Phase 1 Mock 센서로 studylog의 핵심 흐름을 먼저 확인할 수 있습니다.
+              설치나 로그인 없이 데모 센서로 studylog의 핵심 흐름을 먼저 확인할 수 있습니다.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-12 rounded-xl bg-white px-6 text-base text-indigo-700 hover:bg-indigo-50">

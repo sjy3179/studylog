@@ -37,7 +37,7 @@ export function TmPosePredictionCard({
         <div className="flex items-center gap-2">
           <BrainCircuit className="size-5 text-indigo-600" aria-hidden="true" />
           <h3 className="text-sm font-semibold">AI 자세 모델</h3>
-          <Badge variant="secondary">파일럿</Badge>
+          <Badge variant="secondary">최종 모델</Badge>
         </div>
         <Badge variant="outline">TM {snapshot.status}</Badge>
       </div>

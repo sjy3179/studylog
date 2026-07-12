@@ -144,6 +144,7 @@ export function usePoseRuntime({
     let firstInferenceAt: number | null = null
     let inferenceInFlight = false
     let lastDetectedAt: number | null = null
+    let lastCalibrationSampleAt = -Infinity
     let lastInferenceAt = 0
     let lastPublishedAt = 0
     let lastTimestamp = 0
@@ -183,6 +184,38 @@ export function usePoseRuntime({
       lastPublishedAt = now
     }
 
+    const updateCalibration = (now: number) => {
+      const calibration = calibrationRef.current
+      calibration.update(now)
+      const frameIsFresh = Boolean(
+        latestFrame?.detected &&
+          latestFeatures &&
+          now - latestFrame.timestampMs <= POSE_VALIDATION_CONFIG.temporarilyMissingMs,
+      )
+      if (
+        calibration.getStatus() === 'COLLECTING' &&
+        frameIsFresh &&
+        now - lastCalibrationSampleAt >= POSE_INFERENCE_INTERVAL_MS
+      ) {
+        calibration.recordObservation(latestFeatures, now)
+        lastCalibrationSampleAt = now
+      }
+      calibration.update(now)
+      if (calibration.getStatus() !== 'PROCESSING') return
+      try {
+        const nextProfile = calibration.finish({
+          cameraDeviceId: selectedDeviceRef.current,
+        })
+        profileRef.current = nextProfile
+        setProfile(nextProfile)
+        toast.success('기준 자세 등록을 완료했습니다.')
+      } catch (error) {
+        publishCalibrationUi(
+          error instanceof Error ? error.message : '기준 자세 등록에 실패했습니다.',
+        )
+      }
+    }
+
     const run = (now: number) => {
       if (!active) return
       animationFrameId = requestAnimationFrame(run)
@@ -192,6 +225,7 @@ export function usePoseRuntime({
         return
       }
       engine.resume()
+      updateCalibration(now)
       if (
         !video ||
         video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA ||
@@ -224,25 +258,6 @@ export function usePoseRuntime({
             missingSince !== null && now - missingSince >= POSE_VALIDATION_CONFIG.temporarilyMissingMs
               ? 'MISSING'
               : 'TEMPORARILY_MISSING'
-        }
-
-        const calibration = calibrationRef.current
-        calibration.update(now)
-        if (calibration.getStatus() === 'COLLECTING') {
-          calibration.recordObservation(latestFeatures, now)
-        }
-        calibration.update(now)
-        if (calibration.getStatus() === 'PROCESSING') {
-          try {
-            const nextProfile = calibration.finish({
-              cameraDeviceId: selectedDeviceRef.current,
-            })
-            profileRef.current = nextProfile
-            setProfile(nextProfile)
-            toast.success('기준 자세 등록을 완료했습니다.')
-          } catch (error) {
-            publishCalibrationUi(error instanceof Error ? error.message : '기준 자세 등록에 실패했습니다.')
-          }
         }
 
         latestDeviation =

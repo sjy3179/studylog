@@ -23,7 +23,8 @@ export class SessionRecorder {
       modelVersions:context.modelVersion?[context.modelVersion]:[],calibrationProfileId:context.calibrationProfileId,...EMPTY_SESSION_DURATIONS,
       goodPostureRatio:null,recommendedLuxRatio:null,effectiveStudyRatio:null,goalProgressRatio:0,averageLux:null,minimumLux:null,maximumLux:null,
       dominantBadPostureReason:null,sampleCount:0,createdAtIso:context.nowIso,updatedAtIso:context.nowIso }
-    await this.repository.createSession(this.session)
+    const initialSession = this.session
+    await this.enqueue(() => this.repository.createSession(initialSession))
     return id
   }
 
@@ -54,7 +55,7 @@ export class SessionRecorder {
       createdAtIso:this.session.createdAtIso,updatedAtIso:snapshot.nowIso})
     await this.repository.updateSession(summary); this.session = summary; return summary
   }
-  async discard(): Promise<void> { if (this.session) await this.repository.deleteSession(this.session.id); this.session=null }
+  async discard(): Promise<void> { if (this.session) { const id=this.session.id; await this.queue; await this.repository.deleteSession(id) } this.session=null }
   async dispose(): Promise<void> { await this.queue }
   getSessionId(): string | null { return this.session?.id ?? null }
   private track(snapshot: SessionRecordingSnapshot): void { if (!this.session) return; if (!this.session.controlModesUsed.includes(snapshot.controlMode)) this.session.controlModesUsed.push(snapshot.controlMode); if (snapshot.modelVersion && !this.session.modelVersions.includes(snapshot.modelVersion)) this.session.modelVersions.push(snapshot.modelVersion) }

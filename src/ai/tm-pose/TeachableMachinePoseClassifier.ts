@@ -254,7 +254,7 @@ export class TeachableMachinePoseClassifier
     this.model = model
     this.modelInfo = {
       inputResolution: this.validator.resolveInputResolution(metadata),
-      isPilotModel: true,
+      isFinalModel: true,
       labels,
       modelName: metadata.modelName ?? null,
       modelVersion: TM_POSE_MODEL_CONFIG.version,

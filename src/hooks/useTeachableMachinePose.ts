@@ -13,6 +13,7 @@ import type { CameraStatus } from '@/camera/camera-types'
 interface UseTeachableMachinePoseOptions {
   cameraStatus: CameraStatus
   mirrorCamera: boolean
+  pauseInference?: boolean
   videoRef: RefObject<HTMLVideoElement | null>
 }
 
@@ -38,6 +39,7 @@ const INITIAL_SNAPSHOT: TmPoseRuntimeSnapshot = {
 export function useTeachableMachinePose({
   cameraStatus,
   mirrorCamera,
+  pauseInference = false,
   videoRef,
 }: UseTeachableMachinePoseOptions): UseTeachableMachinePoseResult {
   const [snapshot, setSnapshot] = useState<TmPoseRuntimeSnapshot>(INITIAL_SNAPSHOT)
@@ -48,6 +50,7 @@ export function useTeachableMachinePose({
   const initializingRef = useRef<Promise<void> | null>(null)
   const mirrorRef = useRef(mirrorCamera)
   const mountedRef = useRef(true)
+  const pauseInferenceRef = useRef(pauseInference)
   const schedulerRef = useRef<TmPoseInferenceScheduler | null>(null)
 
   useEffect(() => {
@@ -56,6 +59,9 @@ export function useTeachableMachinePose({
   useEffect(() => {
     mirrorRef.current = mirrorCamera
   }, [mirrorCamera])
+  useEffect(() => {
+    pauseInferenceRef.current = pauseInference
+  }, [pauseInference])
 
   const buildClassifier = useCallback(() => {
     const classifier = new TeachableMachinePoseClassifier({
@@ -87,6 +93,7 @@ export function useTeachableMachinePose({
             const video = videoRef.current
             return Boolean(
               enabledRef.current &&
+                !pauseInferenceRef.current &&
                 cameraStatusRef.current === 'READY' &&
                 video &&
                 !video.paused &&
@@ -137,7 +144,7 @@ export function useTeachableMachinePose({
           modelInfo: classifier.getModelInfo(),
           status: cameraStatusRef.current === 'READY' ? 'RUNNING' : 'PAUSED',
         }))
-        if (cameraStatusRef.current === 'READY') scheduler.start()
+        if (cameraStatusRef.current === 'READY' && !pauseInferenceRef.current) scheduler.start()
       })
       .catch((error) => {
         if (!mountedRef.current || classifierRef.current !== classifier) return
@@ -155,7 +162,7 @@ export function useTeachableMachinePose({
   }, [buildClassifier, videoRef])
 
   useEffect(() => {
-    if (cameraStatus === 'READY' && enabledRef.current) {
+    if (cameraStatus === 'READY' && enabledRef.current && !pauseInference) {
       void ensureInitialized()
     } else {
       schedulerRef.current?.stop()
@@ -167,7 +174,7 @@ export function useTeachableMachinePose({
             : current.status,
       }))
     }
-  }, [cameraStatus, ensureInitialized])
+  }, [cameraStatus, ensureInitialized, pauseInference])
 
   useEffect(() => {
     mountedRef.current = true

@@ -219,10 +219,10 @@ export function SettingsPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
-                <CardTitle className="text-base">파일럿 Pose 모델</CardTitle>
+                <CardTitle className="text-base">최종 Pose 모델</CardTitle>
                 <Badge className="gap-1.5" variant="secondary">
                   <Sparkles aria-hidden="true" className="size-3.5" />
-                  정적 자산만 배치
+                  로컬 런타임 연결됨
                 </Badge>
               </div>
             </CardHeader>
@@ -239,7 +239,7 @@ export function SettingsPage() {
                 ))}
               </div>
               <p className="text-xs leading-relaxed text-muted-foreground">
-                모델 파일은 배포 자산에 포함되지만 Phase 3 전까지 어떤 코드에서도 로드하거나 추론하지 않습니다.
+                배포된 로컬 모델을 카메라의 동일 video 입력과 연결해 브라우저 안에서만 추론합니다.
               </p>
             </CardContent>
           </Card>
@@ -278,17 +278,21 @@ export function SettingsPage() {
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-base">알림</CardTitle>
-                <Badge variant="outline">Phase 4 예정</Badge>
+                <Badge variant="outline">현재 정책</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {['자세 경고음', '조도 경고음', 'Toast 알림', '경고 쿨다운'].map((item) => (
+              {[
+                ['자세 안내', '15초 지속 · 120초 쿨다운'],
+                ['조도 안내', 'DARK/TOO_BRIGHT · 60초 쿨다운'],
+                ['화면 알림', 'Toast와 상태 카드로 표시'],
+              ].map(([item, description]) => (
                 <div className="flex min-h-14 items-center justify-between rounded-xl border px-4" key={item}>
                   <span className="flex items-center gap-2 text-sm text-muted-foreground">
                     <BellRing aria-hidden="true" className="size-4" />
                     {item}
                   </span>
-                  <Switch aria-label={`${item} — Phase 4 예정`} disabled />
+                  <span className="text-right text-xs text-muted-foreground">{description}</span>
                 </div>
               ))}
             </CardContent>
@@ -315,8 +319,8 @@ export function SettingsPage() {
                 </div>
                 <div className="rounded-xl border p-4">
                   <ShieldCheck aria-hidden="true" className="size-5 text-emerald-600" />
-                  <p className="mt-3 text-sm font-semibold">Phase 1 저장 정보</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">이 브라우저의 표시 설정, 과목, 목표 시간</p>
+                  <p className="mt-3 text-sm font-semibold">브라우저에 저장하는 정보</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">표시 설정, 캘리브레이션 요약, 세션·평가 기록</p>
                 </div>
               </div>
 
@@ -324,7 +328,7 @@ export function SettingsPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-medium">현재 세션 초기화</p>
-                  <p className="mt-1 text-xs text-muted-foreground">메모리에 누적된 Phase 1 타이머만 0으로 되돌립니다.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">현재 화면의 타이머와 세션 상태를 초기화합니다.</p>
                 </div>
                 <Button className="min-h-11" onClick={resetSession} variant="outline">세션 초기화</Button>
               </div>

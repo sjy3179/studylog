@@ -13,7 +13,7 @@ export const TM_POSE_MODEL_CONFIG = {
   metadataUrl: '/models/tm-pose/metadata.json',
   modelUrl: '/models/tm-pose/model.json',
   poseNetModelUrl: '/models/tm-pose/posenet/model-stride16.json',
-  version: 'pilot-v2',
+  version: 'final-v1',
   expectedLabels: TM_POSE_LABELS,
 } as const
 

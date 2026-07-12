@@ -65,7 +65,7 @@ export interface TmPoseRuntime {
 
 export interface TmPoseModelInfo {
   inputResolution: number
-  isPilotModel: true
+  isFinalModel: true
   labels: TmPoseLabel[]
   modelName: string | null
   modelVersion: string
