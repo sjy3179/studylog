@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
-import { getLuxStatus } from '@/sensors/LuxProvider'
 import { SessionTimer } from '@/session/SessionTimer'
 import {
   useStudySessionStore,
@@ -13,6 +12,7 @@ export function useSessionClock() {
   const lifecycle = useStudySessionStore((state) => state.lifecycle)
   const lux = useStudySessionStore((state) => state.lux)
   const posture = useStudySessionStore((state) => state.posture)
+  const stableLuxStatus = useStudySessionStore((state) => state.stableLuxStatus)
   const sessionRevision = useStudySessionStore((state) => state.sessionRevision)
   const updateDurations = useStudySessionStore((state) => state.updateDurations)
   const countLuxInEffectiveTime = useStudySettingsStore(
@@ -23,7 +23,7 @@ export function useSessionClock() {
   const sampleRef = useRef<SessionTimerSample>({
     countLuxInEffectiveTime,
     lifecycle,
-    luxStatus: getLuxStatus(lux),
+    luxStatus: stableLuxStatus,
     posture,
   })
 
@@ -38,7 +38,7 @@ export function useSessionClock() {
     const nextSample: SessionTimerSample = {
       countLuxInEffectiveTime: settings.countLuxInEffectiveTime,
       lifecycle: session.lifecycle,
-      luxStatus: getLuxStatus(session.lux),
+      luxStatus: session.stableLuxStatus,
       posture: session.posture,
     }
     const durations = timerRef.current?.reset(now)
@@ -53,7 +53,7 @@ export function useSessionClock() {
     const nextSample: SessionTimerSample = {
       countLuxInEffectiveTime,
       lifecycle,
-      luxStatus: getLuxStatus(lux),
+      luxStatus: stableLuxStatus,
       posture,
     }
     const durations = timerRef.current?.tick(performance.now(), sampleRef.current)
@@ -62,7 +62,7 @@ export function useSessionClock() {
     if (durations) {
       updateDurations(durations)
     }
-  }, [countLuxInEffectiveTime, lifecycle, lux, posture, updateDurations])
+  }, [countLuxInEffectiveTime, lifecycle, lux, posture, stableLuxStatus, updateDurations])
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {

@@ -17,6 +17,7 @@ import { CalibrationDialog } from '@/components/camera/CalibrationDialog'
 import { PoseDebugPanel } from '@/components/camera/PoseDebugPanel'
 import { PoseOverlayCanvas } from '@/components/camera/PoseOverlayCanvas'
 import { TmPosePredictionCard } from '@/components/camera/TmPosePredictionCard'
+import { RuntimeDebugPanel } from '@/components/runtime/RuntimeDebugPanel'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,8 +25,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useCamera } from '@/hooks/useCamera'
 import { usePoseRuntime } from '@/hooks/usePoseRuntime'
 import { useTeachableMachinePose } from '@/hooks/useTeachableMachinePose'
+import { useStudyRuntime } from '@/hooks/useStudyRuntime'
 import { cn } from '@/lib/utils'
-import { useStudySettingsStore } from '@/stores/useStudyStore'
+import { useStudySessionStore, useStudySettingsStore } from '@/stores/useStudyStore'
 
 const PRESENCE_COPY: Record<PosePresenceStatus, { label: string; className: string }> = {
   UNKNOWN: { label: '사람 확인 전', className: 'border-slate-200 bg-slate-50 text-slate-700' },
@@ -60,6 +62,7 @@ export function CameraPanel() {
   const setShowCameraPreview = useStudySettingsStore((state) => state.setShowCameraPreview)
   const showPoseOverlay = useStudySettingsStore((state) => state.showPoseOverlay)
   const setShowPoseOverlay = useStudySettingsStore((state) => state.setShowPoseOverlay)
+  const setControlMode = useStudySessionStore((state) => state.setControlMode)
   const runtime = usePoseRuntime({
     cameraError,
     cameraStatus,
@@ -70,6 +73,11 @@ export function CameraPanel() {
     cameraStatus,
     mirrorCamera,
     videoRef,
+  })
+  useStudyRuntime({
+    cameraStatus,
+    poseSnapshot: runtime.snapshot,
+    tmSnapshot: tmRuntime.snapshot,
   })
   const isCameraReady = cameraStatus === 'READY'
   const isCameraBusy = ['REQUESTING_PERMISSION', 'STARTING', 'STOPPING'].includes(cameraStatus)
@@ -83,8 +91,16 @@ export function CameraPanel() {
   )
 
   const continueDemo = () => {
+    setControlMode('MOCK')
+    tmRuntime.continueWithMock()
     stop()
     toast.info('카메라 없이 기존 Mock 자세 제어를 계속 사용할 수 있습니다.')
+  }
+
+  const startAi = async () => {
+    setControlMode('AI')
+    await start()
+    if (!tmRuntime.snapshot.enabled) await tmRuntime.retry()
   }
 
   return (
@@ -93,7 +109,7 @@ export function CameraPanel() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base">실시간 자세 분석</CardTitle>
-            <Badge variant="secondary">Phase 3</Badge>
+            <Badge variant="secondary">Phase 4</Badge>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">카메라 {cameraStatus}</Badge>
@@ -149,7 +165,7 @@ export function CameraPanel() {
                 </p>
                 {!isCameraBusy && cameraStatus !== 'ERROR' ? (
                   <div className="mt-4 flex flex-col justify-center gap-2 sm:flex-row">
-                    <Button className="min-h-11 gap-2" onClick={() => void start()}>
+                    <Button className="min-h-11 gap-2" onClick={() => void startAi()}>
                       <Camera aria-hidden="true" className="size-4" />카메라 켜기
                     </Button>
                     <Button className="min-h-11 border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white" onClick={continueDemo} variant="outline">
@@ -223,13 +239,14 @@ export function CameraPanel() {
             ) : null}
 
             <PoseDebugPanel snapshot={runtime.snapshot} />
+            <RuntimeDebugPanel />
 
           </>
         ) : null}
 
         <TmPosePredictionCard
           inputCanvas={tmRuntime.inputCanvas}
-          onContinueMock={tmRuntime.continueWithMock}
+          onContinueMock={continueDemo}
           onPrepare={() => void tmRuntime.prepareModel()}
           onRetry={() => void tmRuntime.retry()}
           snapshot={tmRuntime.snapshot}
@@ -237,7 +254,7 @@ export function CameraPanel() {
 
         <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
           <LockKeyhole aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          원본 영상·이미지·관절 배열·TM 입력 frame은 저장하지 않습니다. MediaPipe와 TM 원시 결과는 정보 표시용이며 Mock GOOD/BAD/AWAY와 순공 타이머를 변경하지 않습니다.
+          원본 영상·이미지·관절 배열·TM 입력 frame은 저장하지 않습니다. AI 모드에서는 요약 신호만 융합·안정화해 타이머 조건에 사용합니다.
         </div>
       </CardContent>
 

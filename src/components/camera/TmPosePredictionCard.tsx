@@ -77,9 +77,10 @@ export function TmPosePredictionCard({
       ) : null}
 
       {!snapshot.enabled ? (
-        <p className="rounded-xl bg-slate-50 p-4 text-sm text-muted-foreground">
-          TM 원시 예측을 멈췄습니다. 기존 Mock GOOD/BAD/AWAY 데모와 순공 타이머는 계속 동작합니다.
-        </p>
+        <div className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">TM 원시 예측을 멈췄습니다. 명시적으로 다시 시작할 수 있습니다.</p>
+          <Button className="min-h-11" onClick={onRetry} variant="outline">AI 모델 다시 시작</Button>
+        </div>
       ) : null}
 
       {prediction && snapshot.enabled ? (
@@ -100,7 +101,7 @@ export function TmPosePredictionCard({
       ) : null}
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        현재 결과는 상태 안정화 전의 원시 예측입니다. 기존 Mock 자세 상태 및 순공 타이머에는 반영되지 않습니다.
+        현재 결과는 상태 안정화 전의 원시 예측입니다. AI 모드에서는 MediaPipe와 융합한 뒤 다수결·지속시간을 통과한 결과만 타이머에 반영됩니다.
       </p>
       <TmPoseDebugPanel inputCanvas={inputCanvas} snapshot={snapshot} />
     </section>

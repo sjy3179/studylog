@@ -60,3 +60,12 @@
 - MediaPipe 140ms loop와 TM 400ms loop는 `BrowserAiInferenceCoordinator`를 공유한다. TM 평균 추론이 250ms를 넘으면 600ms, 450ms를 넘으면 1000ms로 완화한다.
 - TM hook의 state에는 요약 예측·모델 정보·오류·성능만 둔다. video/canvas/model/posenetOutput/tensor는 service와 ref에만 두며 원본 frame을 저장하지 않는다.
 - TM 결과는 원시 확률 UI와 `/evaluate` 진단 화면에만 사용한다. Mock store와 타이머에 대한 융합은 Phase 4 범위다.
+
+## Phase 4 런타임 통합
+
+- 정상 `/app`은 AI 모드, `?demo=1`은 명시적 Mock 모드로 시작한다. 두 모드의 자세 입력은 store에서 분리하고 모드 전환 시 ring buffer·후보·경고 상태를 초기화한다.
+- MediaPipe 결과 600ms, TM 결과 1000ms freshness를 적용한다. 신선하지 않은 GOOD은 타이머에 사용하지 않는다.
+- Fusion 결과는 새 MediaPipe 관측 시각을 식별자로 사용해 같은 프레임이 ring buffer에 반복 추가되지 않게 한다. MediaPipe가 stale이면 runtime tick 시각으로 UNKNOWN을 발생시켜 grace 전환을 진행한다.
+- 안정화는 최근 12개 중 8개 합의와 GOOD 1.5초, BAD 3초, AWAY 2.5초, UNKNOWN grace 2초를 적용한다. UNKNOWN과 AWAY 후보 전환 중에는 순공 증가를 막는다.
+- raw Lux는 즉시 표시하고 timer용 Lux는 20 Lux hysteresis와 3초 지속 후 변경한다.
+- 기존 `SessionTimer`와 `useSessionClock`을 단일 시간 누적 경로로 유지한다. Phase 4 runtime은 안정 자세와 안정 Lux만 store에 제공하며 별도 timer loop를 만들지 않는다.

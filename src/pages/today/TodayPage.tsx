@@ -17,6 +17,7 @@ import {
   TriangleAlert,
 } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
+import { useEffect } from 'react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { CameraPanel } from '@/components/camera/CameraPanel'
@@ -126,6 +127,15 @@ const LUX_LABELS: Record<LuxStatus, string> = {
   TOO_BRIGHT: '매우 밝음',
 }
 
+const BLOCKING_COPY = {
+  CAMERA_NOT_READY: '카메라를 켜 주세요.',
+  MEDIAPIPE_NOT_READY: 'MediaPipe 자세 분석을 준비하고 있습니다.',
+  TM_NOT_READY: 'Teachable Machine 모델을 준비하고 있습니다.',
+  CALIBRATION_REQUIRED: '기준 자세를 먼저 등록해 주세요.',
+  MODEL_ERROR: '자세 모델 오류를 확인하거나 데모 모드를 선택해 주세요.',
+  CAMERA_ERROR: '카메라 오류를 확인하거나 데모 모드를 선택해 주세요.',
+} as const
+
 function TimerDetail({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl border bg-muted/35 px-4 py-3">
@@ -140,7 +150,11 @@ function TimerDetail({ label, value }: { label: string; value: number }) {
 export function TodayPage() {
   const [searchParams] = useSearchParams()
   const lifecycle = useStudySessionStore((state) => state.lifecycle)
+  const controlMode = useStudySessionStore((state) => state.controlMode)
   const posture = useStudySessionStore((state) => state.posture)
+  const mockPosture = useStudySessionStore((state) => state.mockPosture)
+  const runtimeSnapshot = useStudySessionStore((state) => state.runtimeSnapshot)
+  const stableLuxStatus = useStudySessionStore((state) => state.stableLuxStatus)
   const lux = useStudySessionStore((state) => state.lux)
   const durations = useStudySessionStore((state) => state.durations)
   const finishSession = useStudySessionStore((state) => state.finishSession)
@@ -148,6 +162,7 @@ export function TodayPage() {
   const resetSession = useStudySessionStore((state) => state.resetSession)
   const setLux = useStudySessionStore((state) => state.setLux)
   const setPosture = useStudySessionStore((state) => state.setPosture)
+  const setControlMode = useStudySessionStore((state) => state.setControlMode)
   const startSession = useStudySessionStore((state) => state.startSession)
 
   const countLuxInEffectiveTime = useStudySettingsStore(
@@ -159,8 +174,10 @@ export function TodayPage() {
   const subject = useStudySettingsStore((state) => state.subject)
   const timerVisibility = useStudySettingsStore((state) => state.timerVisibility)
 
-  const luxStatus = getLuxStatus(lux)
-  const derivedStatus = deriveStudyStatus({ lifecycle, posture, luxStatus })
+  const rawLuxStatus = getLuxStatus(lux)
+  const luxStatus = stableLuxStatus
+  const displayPosture = runtimeSnapshot?.stablePosture.state ?? posture
+  const derivedStatus = deriveStudyStatus({ lifecycle, posture: displayPosture, luxStatus })
   const statusContent =
     lifecycle === 'IDLE'
       ? READY_STATUS_CONTENT
@@ -175,15 +192,19 @@ export function TodayPage() {
   const isFinished = lifecycle === 'FINISHED'
   const demoExpanded = searchParams.get('demo') === '1'
 
+  useEffect(() => {
+    setControlMode(demoExpanded ? 'MOCK' : 'AI')
+  }, [demoExpanded, setControlMode])
+
   return (
     <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Badge variant="secondary">Phase 3</Badge>
+            <Badge variant="secondary">Phase 4</Badge>
             <Badge className="gap-1.5" variant="outline">
               <Sparkles aria-hidden="true" className="size-3.5 text-primary" />
-              Mock 센서
+              {controlMode === 'AI' ? 'AI 제어' : '데모 제어'}
             </Badge>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">오늘의 캠스터디</h1>
@@ -350,7 +371,7 @@ export function TodayPage() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-base">현재 상태</CardTitle>
-                <Badge variant="secondary">가상 분류</Badge>
+                <Badge variant="secondary">{controlMode === 'AI' ? 'AI 모드' : 'Mock 모드'}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -358,27 +379,44 @@ export function TodayPage() {
                 <StatusIcon aria-hidden="true" className="size-6" />
                 <div>
                   <p className="font-semibold">{statusContent.label}</p>
-                  <p className="text-xs opacity-80">Mock {posture}</p>
+                  <p className="text-xs opacity-80">
+                    {controlMode === 'AI'
+                      ? runtimeSnapshot?.blockingReason
+                        ? BLOCKING_COPY[runtimeSnapshot.blockingReason]
+                        : `안정 상태 ${displayPosture}`
+                      : `Mock ${mockPosture}`}
+                  </p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-2" aria-label="Mock 자세 선택" role="group">
-                {(['GOOD', 'BAD', 'AWAY'] as const).map((value) => (
-                  <Button
-                    aria-pressed={posture === value}
-                    className={cn(
-                      'min-h-11 px-2',
-                      posture === value && value === 'GOOD' && 'bg-emerald-600 hover:bg-emerald-600',
-                      posture === value && value === 'BAD' && 'bg-amber-600 hover:bg-amber-600',
-                      posture === value && value === 'AWAY' && 'bg-slate-600 hover:bg-slate-600',
-                    )}
-                    key={value}
-                    onClick={() => setPosture(value)}
-                    variant={posture === value ? 'default' : 'outline'}
-                  >
-                    {value}
+              {controlMode === 'MOCK' ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2" aria-label="Mock 자세 선택" role="group">
+                    {(['GOOD', 'BAD', 'AWAY'] as const).map((value) => (
+                    <Button
+                      aria-pressed={mockPosture === value}
+                      className={cn(
+                        'min-h-11 px-2',
+                        mockPosture === value && value === 'GOOD' && 'bg-emerald-600 hover:bg-emerald-600',
+                        mockPosture === value && value === 'BAD' && 'bg-amber-600 hover:bg-amber-600',
+                        mockPosture === value && value === 'AWAY' && 'bg-slate-600 hover:bg-slate-600',
+                      )}
+                      key={value}
+                      onClick={() => setPosture(value)}
+                      variant={mockPosture === value ? 'default' : 'outline'}
+                    >
+                      {value}
+                    </Button>
+                    ))}
+                  </div>
+                  <Button className="w-full" onClick={() => setControlMode('AI')} variant="outline">
+                    AI 모드로 전환
                   </Button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <Button className="w-full" onClick={() => setControlMode('MOCK')} variant="outline">
+                  비상 데모 모드로 전환
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -428,7 +466,7 @@ export function TodayPage() {
                 </div>
               </div>
 
-              {luxStatus === 'DARK' || luxStatus === 'DIM' ? (
+              {luxStatus === 'DARK' ? (
                 <Alert className="border-amber-200 bg-amber-50 text-amber-900">
                   <SunMedium aria-hidden="true" />
                   <AlertTitle>주변이 너무 어둡습니다.</AlertTitle>
@@ -441,6 +479,9 @@ export function TodayPage() {
                   <AlertTitle>주변이 지나치게 밝습니다.</AlertTitle>
                   <AlertDescription>화면이나 책상에 강한 반사가 없는지 확인해 주세요.</AlertDescription>
                 </Alert>
+              ) : null}
+              {rawLuxStatus !== luxStatus ? (
+                <p className="text-xs text-muted-foreground">새 조도 상태를 3초 동안 확인하고 있습니다.</p>
               ) : null}
             </CardContent>
           </Card>
