@@ -16,12 +16,14 @@ import { CameraErrorState } from '@/components/camera/CameraErrorState'
 import { CalibrationDialog } from '@/components/camera/CalibrationDialog'
 import { PoseDebugPanel } from '@/components/camera/PoseDebugPanel'
 import { PoseOverlayCanvas } from '@/components/camera/PoseOverlayCanvas'
+import { TmPosePredictionCard } from '@/components/camera/TmPosePredictionCard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useCamera } from '@/hooks/useCamera'
 import { usePoseRuntime } from '@/hooks/usePoseRuntime'
+import { useTeachableMachinePose } from '@/hooks/useTeachableMachinePose'
 import { cn } from '@/lib/utils'
 import { useStudySettingsStore } from '@/stores/useStudyStore'
 
@@ -64,6 +66,11 @@ export function CameraPanel() {
     selectedDeviceId,
     videoRef,
   })
+  const tmRuntime = useTeachableMachinePose({
+    cameraStatus,
+    mirrorCamera,
+    videoRef,
+  })
   const isCameraReady = cameraStatus === 'READY'
   const isCameraBusy = ['REQUESTING_PERMISSION', 'STARTING', 'STOPPING'].includes(cameraStatus)
   const engineReady = ['READY', 'RUNNING', 'PAUSED'].includes(runtime.snapshot.engineStatus)
@@ -86,7 +93,7 @@ export function CameraPanel() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base">실시간 자세 분석</CardTitle>
-            <Badge variant="secondary">Phase 2</Badge>
+            <Badge variant="secondary">Phase 3</Badge>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">카메라 {cameraStatus}</Badge>
@@ -216,12 +223,21 @@ export function CameraPanel() {
             ) : null}
 
             <PoseDebugPanel snapshot={runtime.snapshot} />
+
           </>
         ) : null}
 
+        <TmPosePredictionCard
+          inputCanvas={tmRuntime.inputCanvas}
+          onContinueMock={tmRuntime.continueWithMock}
+          onPrepare={() => void tmRuntime.prepareModel()}
+          onRetry={() => void tmRuntime.retry()}
+          snapshot={tmRuntime.snapshot}
+        />
+
         <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
           <LockKeyhole aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          원본 영상·이미지·관절 배열은 저장하지 않습니다. 사람 감지와 편차는 정보 표시용이며 Mock GOOD/BAD/AWAY와 순공 타이머를 변경하지 않습니다.
+          원본 영상·이미지·관절 배열·TM 입력 frame은 저장하지 않습니다. MediaPipe와 TM 원시 결과는 정보 표시용이며 Mock GOOD/BAD/AWAY와 순공 타이머를 변경하지 않습니다.
         </div>
       </CardContent>
 

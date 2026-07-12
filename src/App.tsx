@@ -19,9 +19,9 @@ const GroupsPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('@/pages/settings/SettingsPage').then((module) => ({ default: module.SettingsPage })),
 )
-const EvaluationPlaceholderPage = lazy(() =>
-  import('@/pages/evaluation/EvaluationPlaceholderPage').then((module) => ({
-    default: module.EvaluationPlaceholderPage,
+const EvaluationPage = lazy(() =>
+  import('@/pages/evaluation/EvaluationPage').then((module) => ({
+    default: module.EvaluationPage,
   })),
 )
 const ReportPlaceholderPage = lazy(() =>
@@ -55,7 +55,7 @@ export function App() {
           <Route element={<GroupsPage />} path="groups" />
           <Route element={<SettingsPage />} path="settings" />
         </Route>
-        <Route element={<EvaluationPlaceholderPage />} path="/evaluate" />
+        <Route element={<EvaluationPage />} path="/evaluate" />
         <Route element={<ReportPlaceholderPage />} path="/report/:sessionId" />
         <Route element={<NotFoundPage />} path="*" />
       </Routes>

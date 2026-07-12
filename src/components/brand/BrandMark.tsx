@@ -1,4 +1,3 @@
-import { ScanLine } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { cn } from '@/lib/utils'
@@ -13,13 +12,22 @@ export function BrandMark({ compact = false, className, to = '/' }: BrandMarkPro
   return (
     <Link
       aria-label="studylog 홈"
-      className={cn('inline-flex items-center gap-2.5 font-semibold tracking-tight', className)}
+      className={cn(
+        'inline-flex min-h-11 items-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        className,
+      )}
       to={to}
     >
-      <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/20">
-        <ScanLine aria-hidden="true" className="size-5" strokeWidth={2.2} />
-      </span>
-      {!compact && <span className="text-lg text-foreground">studylog</span>}
+      <img
+        alt=""
+        aria-hidden="true"
+        className={cn(
+          'rounded-[30%] bg-white object-contain shadow-sm ring-1 ring-slate-200/70',
+          compact ? 'size-10' : 'size-12',
+        )}
+        decoding="async"
+        src="/studylog_logo.svg"
+      />
     </Link>
   )
 }

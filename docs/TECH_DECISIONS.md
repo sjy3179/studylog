@@ -1,6 +1,6 @@
 # studylog 기술 결정
 
-이 문서는 Phase 1에서 확정한 구현 경계와 교체 지점을 기록한다. 전체 제품 요구사항은 [PROJECT_BRIEF.md](PROJECT_BRIEF.md)를 따른다.
+이 문서는 Phase 1~3에서 확정한 구현 경계와 교체 지점을 기록한다. 전체 제품 요구사항은 [PROJECT_BRIEF.md](PROJECT_BRIEF.md)를 따른다.
 
 ## 애플리케이션 기반
 
@@ -26,7 +26,7 @@
 
 ## 모델 자산과 향후 교체
 
-- 제공 파일은 Teachable Machine Pose 프로젝트가 내보낸 TensorFlow.js 모델이며 `public/models/tm-pose/`에 원본 그대로 둔다.
+- 제공 파일은 Teachable Machine Pose 프로젝트가 내보낸 TensorFlow.js 모델이며 `public/models/tm-pose/`에 배치한다. 내보낸 메타데이터의 `FOWARD_LEAN` 오타는 프로젝트의 고정 클래스 계약에 맞춰 `FORWARD_LEAN`으로 정정했다.
 - 모델 클래스는 `GOOD_POSTURE`, `FORWARD_LEAN`, `SIDE_LEAN`, `RESTING`이다. `model.json`은 `weights.bin`을 참조한다.
 - Phase 1 번들은 이 모델을 import, fetch, 검증 또는 추론하지 않는다. 실제 로컬 모델 연동과 런타임 버전 고정은 Phase 3에서 어댑터 내부에 격리해 결정한다.
 - Phase 2는 단일 카메라 stream과 MediaPipe만 다루며 Teachable Machine 연동을 시작하지 않는다.
@@ -48,3 +48,15 @@
 - 좌우반전은 video와 canvas의 CSS 표시 transform에만 적용한다. MediaPipe 입력과 캘리브레이션 특징은 원본 좌표를 유지한다.
 - 캘리브레이션은 3초 카운트다운, 2.5초 수집, 최소 12개 유효 샘플, 중앙값과 MAD 품질 검사를 사용한다. `studylog:calibration:v1`에는 비율 기준과 품질 요약만 저장한다.
 - 상대 편차와 raw presence는 정보 UI 전용이다. Phase 1 Mock 자세 상태나 `StudyStateMachine`·`SessionTimer` 입력을 변경하지 않는다.
+
+## Phase 3 Teachable Machine Pose
+
+- production 런타임은 `NPM_ESM` 하나만 사용한다. `@teachablemachine/pose@0.8.6`, 정확한 peer인 `@tensorflow/tfjs@1.3.1`, `@tensorflow-models/posenet@2.2.1`, TF.js core/converter `1.3.1`을 고정하고 사용자가 카메라 또는 모델 확인을 요청한 뒤 dynamic import한다. PoseNet 2.2.2는 TF.js 3.x를 요구해 제외했다. Vite 8 production build와 strict typecheck를 통과하면 local UMD fallback은 포함하지 않는다.
+- 구형 TF.js 패키지 내부 TypeScript enum을 TypeScript 6이 검사할 수 있도록 `erasableSyntaxOnly`만 끈다. `strict`, `noEmit`, `skipLibCheck`와 나머지 검사 옵션은 유지한다.
+- `metadata.json`은 runtime 모델보다 먼저 검증한다. 파일럿 metadata의 export TF.js 버전은 1.7.4지만 모델 topology가 Dense/Dropout과 4-class softmax로 구성되어 있어 패키지 peer runtime 1.3.1에서 실제 브라우저 load·predict를 최종 확인한다.
+- 공식 `tmPose.load()`는 metadata 설정에 따라 PoseNet graph를 Google Storage에서 불러온다. 외부 CDN 금지 조건 때문에 MobileNetV1 0.75/stride16 공식 manifest와 두 shard를 `public/models/tm-pose/posenet/`에 고정하고, runtime adapter가 `tf.loadLayersModel`·`poseNet.load({ modelUrl })`·`tmPose.CustomPoseNet`으로 동일 모델을 구성한다. 추론은 공식 `estimatePose → predict` API를 그대로 사용한다.
+- TM adapter는 Phase 2의 동일 video element를 입력으로 받는다. 별도 stream, `tmPose.Webcam`, 추가 `getUserMedia`는 없다.
+- 입력 canvas 하나를 재사용하고 중앙 정사각형을 257px로 crop한다. mirror 설정은 canvas draw에 적용하며 `estimatePose`의 flip 인자는 항상 false다.
+- MediaPipe 140ms loop와 TM 400ms loop는 `BrowserAiInferenceCoordinator`를 공유한다. TM 평균 추론이 250ms를 넘으면 600ms, 450ms를 넘으면 1000ms로 완화한다.
+- TM hook의 state에는 요약 예측·모델 정보·오류·성능만 둔다. video/canvas/model/posenetOutput/tensor는 service와 ref에만 두며 원본 frame을 저장하지 않는다.
+- TM 결과는 원시 확률 UI와 `/evaluate` 진단 화면에만 사용한다. Mock store와 타이머에 대한 융합은 Phase 4 범위다.

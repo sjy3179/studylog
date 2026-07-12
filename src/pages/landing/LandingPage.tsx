@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { BrandMark } from '@/components/brand/BrandMark'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -199,16 +200,7 @@ export function LandingPage() {
 
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
         <div className={`${pageWidth} flex h-16 items-center justify-between`}>
-          <Link
-            to="/"
-            className="flex min-h-11 items-center gap-2 rounded-lg text-lg font-bold tracking-[-0.035em] text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-            aria-label="studylog 홈"
-          >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm shadow-indigo-200">
-              <Clock3 aria-hidden="true" className="size-4" />
-            </span>
-            studylog
-          </Link>
+          <BrandMark className="focus-visible:ring-indigo-500" to="/" />
 
           <nav className="hidden items-center gap-7 md:flex" aria-label="주요 메뉴">
             <a
@@ -286,7 +278,7 @@ export function LandingPage() {
                   variant="outline"
                   className="h-12 rounded-xl border-slate-200 bg-white px-6 text-base text-slate-800 shadow-sm hover:bg-slate-50"
                 >
-                  <Link to="/app?demo=1">심사위원 데모</Link>
+                  <Link to="/app?demo=1">데모</Link>
                 </Button>
               </div>
               <a
@@ -632,7 +624,7 @@ export function LandingPage() {
                 variant="outline"
                 className="h-12 rounded-xl border-indigo-400 bg-indigo-600 px-6 text-base text-white hover:bg-indigo-700 hover:text-white"
               >
-                <Link to="/app?demo=1">심사위원 데모</Link>
+                <Link to="/app?demo=1">데모</Link>
               </Button>
             </div>
           </div>
@@ -641,9 +633,7 @@ export function LandingPage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className={`${pageWidth} flex flex-col gap-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between`}>
-          <Link to="/" className="font-bold tracking-[-0.02em] text-slate-900">
-            studylog
-          </Link>
+          <BrandMark compact to="/" />
           <p>착석·자세·조도 조건을 기록하는 개인용 캠스터디</p>
         </div>
       </footer>
