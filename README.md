@@ -137,4 +137,8 @@ AI 문제 해결:
 - 기록 및 평가 화면의 삭제 버튼으로 각 로컬 데이터를 지울 수 있습니다. 캘리브레이션과 일반 설정은 학습 기록 삭제 대상이 아닙니다.
 - Phase 6에서 CSV를 사용하는 Python 분석을 별도로 구현할 예정입니다.
 
-전체 요구사항은 [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md), [PHASE_2_BRIEF.md](docs/PHASE_2_BRIEF.md), [PHASE_3_BRIEF.md](docs/PHASE_3_BRIEF.md), [PHASE_4_BRIEF.md](docs/PHASE_4_BRIEF.md), [PHASE_5_BRIEF.md](docs/PHASE_5_BRIEF.md), 반복 작업 규칙은 [AGENTS.md](AGENTS.md), 기술 결정은 [TECH_DECISIONS.md](docs/TECH_DECISIONS.md)를 참고하세요.
+## Phase 6 오프라인 Python 분석
+
+`python/`에는 Phase 5에서 다운로드한 세션 표본·요약·모델 평가 CSV를 분석하는 Python 3.11+ CLI가 있습니다. 기본 분석은 AI 세션만 사용하며 누적 duration 행을 합산하지 않습니다. 실행법, 고정 의존성, 출력 리포트와 개인정보 경계는 [Python README](python/README.md)를 참고하세요.
+
+전체 요구사항은 [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md), [PHASE_2_BRIEF.md](docs/PHASE_2_BRIEF.md), [PHASE_3_BRIEF.md](docs/PHASE_3_BRIEF.md), [PHASE_4_BRIEF.md](docs/PHASE_4_BRIEF.md), [PHASE_5_BRIEF.md](docs/PHASE_5_BRIEF.md), [PHASE_6_BRIEF.md](docs/PHASE_6_BRIEF.md), 반복 작업 규칙은 [AGENTS.md](AGENTS.md), 기술 결정은 [TECH_DECISIONS.md](docs/TECH_DECISIONS.md)를 참고하세요.

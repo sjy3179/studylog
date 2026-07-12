@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 .vercel
 .env*
+
+# Python analysis artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+python/reports/*
+!python/reports/.gitkeep

@@ -54,4 +54,12 @@
 - AI/MOCK/MIXED 세션을 구분하고 MOCK/MIXED는 기본 기록 통계에서 제외한다.
 - 서버 API, 클라우드 동기화, Python 분석, 모델 재학습은 Phase 5에서 구현하지 않는다.
 
-Phase 5 완료 보고 후 멈추며 Phase 6 Python 분석을 시작하지 않는다.
+## Phase 6 분석 경계
+
+- `python/` 프로그램은 Phase 5 CSV를 오프라인으로만 분석하며 웹 서버나 IndexedDB 직접 접근을 구현하지 않는다.
+- 표본의 7개 duration 컬럼은 누적값이므로 행별 합산하지 않는다. 요약 CSV, 마지막 유효 표본, 컬럼 최대값 순으로 최종값을 결정한다.
+- 기본 분석은 AI 세션만 포함하고 `--include-demo`에서만 MOCK/MIXED를 포함한다.
+- 고정 자세 클래스 순서는 GOOD_POSTURE, FORWARD_LEAN, SIDE_LEAN, RESTING이다.
+- 합성 fixture 결과를 실제 사용자 또는 모델 성능으로 표현하지 않는다.
+
+Phase 6 완료 보고 후 멈추며 Phase 7을 시작하지 않는다.
