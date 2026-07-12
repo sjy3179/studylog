@@ -1,4 +1,4 @@
-# Phase 1 기술 결정
+# studylog 기술 결정
 
 이 문서는 Phase 1에서 확정한 구현 경계와 교체 지점을 기록한다. 전체 제품 요구사항은 [PROJECT_BRIEF.md](PROJECT_BRIEF.md)를 따른다.
 
@@ -36,3 +36,15 @@
 - 인증, 백엔드, API, 데이터베이스, WebSocket과 그룹 네트워크 통신을 두지 않는다.
 - 그룹은 코드 상수 기반 UI 데모이며 모든 변경성 액션을 비활성화한다.
 - 영상·이미지·음성은 저장하거나 전송하지 않는다. 서비스 문구는 실제 집중력 측정이나 의료적 효과를 주장하지 않는다.
+
+## Phase 2 카메라와 MediaPipe
+
+- `@mediapipe/tasks-vision`은 공식 npm의 `0.10.35`를 정확히 고정한다. React 19, Vite 8, TypeScript strict와 lint/test/build를 실제 통과한 버전만 유지한다.
+- CDN script와 런타임 CDN 자산을 사용하지 않는다. 패키지의 `wasm` 전체는 `scripts/sync-mediapipe-assets.mjs`가 `public/mediapipe/wasm/`으로 복사하고, Google AI Edge 공식 Pose Landmarker Lite 모델은 `public/models/mediapipe/pose_landmarker_lite.task`에 둔다.
+- 카메라 접근은 `CameraManager`에 격리한다. 사용자 클릭 전에 권한을 요청하지 않고 stream·video는 각각 하나만 사용하며 장치 변경, track 종료, route unmount에서 정리한다.
+- `MediaPipePoseEngine`은 initialize Promise와 PoseLandmarker를 하나만 유지하고 GPU delegate 실패 시 CPU로 한 번 fallback한다.
+- 추론은 requestAnimationFrame에서 약 140ms 간격으로 제한하고 같은 `video.currentTime`, 준비되지 않은 video, hidden 탭, in-flight 상태를 건너뛴다.
+- MediaPipe 원본 결과는 앱 전체에 노출하지 않고 자체 타입으로 즉시 매핑한다. landmark 배열은 canvas 구독자에게만 전달하며 React 전역 state에는 요약값만 넣는다.
+- 좌우반전은 video와 canvas의 CSS 표시 transform에만 적용한다. MediaPipe 입력과 캘리브레이션 특징은 원본 좌표를 유지한다.
+- 캘리브레이션은 3초 카운트다운, 2.5초 수집, 최소 12개 유효 샘플, 중앙값과 MAD 품질 검사를 사용한다. `studylog:calibration:v1`에는 비율 기준과 품질 요약만 저장한다.
+- 상대 편차와 raw presence는 정보 UI 전용이다. Phase 1 Mock 자세 상태나 `StudyStateMachine`·`SessionTimer` 입력을 변경하지 않는다.

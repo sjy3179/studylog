@@ -9,11 +9,19 @@
 - 화면 컴포넌트와 자세 분류, 센서, 상태 머신, 타이머, 저장 로직의 책임을 분리한다.
 - 각 Phase 완료 시 `npm run lint`, `npm run test`, `npm run build`를 모두 실행하고 결과와 남은 TODO를 보고한다.
 
-## Phase 1 경계
+## Phase 2 경계
 
-- Phase 1은 `MockPostureClassifier`와 `MockLuxProvider`만 사용한다.
-- 실제 카메라, MediaPipe, Teachable Machine 추론을 연결하거나 AI 런타임 의존성을 설치·로드하지 않는다.
-- 제공 모델은 정적 자산으로만 보존하며 실제 연동은 Phase 3에서 수행한다.
+- 카메라 권한은 사용자가 버튼을 누른 뒤에만 요청하며 `CameraManager`가 한 번에 `MediaStream` 하나만 관리한다.
+- MediaPipe Pose Landmarker Lite는 `/mediapipe/wasm`과 `/models/mediapipe/pose_landmarker_lite.task`의 로컬 자산만 사용한다.
+- video·overlay 좌우반전은 표시용 transform 하나로 관리한다. 추론·캘리브레이션 좌표를 다시 뒤집지 않는다.
+- 원본 MediaPipe result와 매 프레임 landmark 배열을 Zustand, localStorage, IndexedDB에 저장하지 않는다.
+- MediaPipe의 사람 감지·편차는 화면 정보, 캘리브레이션, 디버그에만 사용한다. `setPosture`, `StudyStateMachine`, `SessionTimer`에 연결하지 않는다.
+- 기존 `MockPostureClassifier`와 `MockLuxProvider`, Mock GOOD/BAD/AWAY 타이머 제어는 유지한다.
+- Teachable Machine Pose, TensorFlow.js, 결과 융합, 실제 카메라 기반 GOOD/BAD/AWAY, 자동 타이머 제어는 Phase 3·4 전까지 구현하지 않는다.
+- WASM 파일은 `scripts/sync-mediapipe-assets.mjs`와 `postinstall`로 패키지에서 이름 그대로 동기화한다.
+- 캘리브레이션은 3초 카운트다운, 2.5초 수집, 최소 12개 유효 샘플, 특징별 중앙값을 사용하고 `studylog:calibration:v1`에 요약 프로필만 저장한다.
+- route unmount·카메라 OFF·장치 변경에서 rAF, PoseLandmarker, event listener, 모든 video track을 정리한다.
+- 제공 TM 모델은 정적 자산으로만 보존하며 실제 연동은 Phase 3에서 수행한다.
 - 모델 경로는 `public/models/tm-pose/`이고 파일명은 `model.json`, `metadata.json`, `weights.bin`이다.
 - 모델 클래스는 정확히 `GOOD_POSTURE`, `FORWARD_LEAN`, `SIDE_LEAN`, `RESTING` 네 개다. `AWAY`는 모델 클래스가 아니다.
 - 로그인, 인증, 백엔드, API, 서버 함수, 데이터베이스, Supabase, Firebase, WebSocket, 환경 변수 기반 연동을 구현하지 않는다.
@@ -33,4 +41,4 @@
 - 실제 집중력 측정, 의료 진단, 거북목·척추 진단, 시력 보호 보장, 완전한 자세 인식으로 표현하지 않는다.
 - 관찰 가능한 자세 분류와 설정 조건 충족 시간임을 명확히 하고 환경에 따라 오분류될 수 있음을 안내한다.
 
-Phase 1 완료 보고 후 멈추며 Phase 2 MediaPipe 연동을 시작하지 않는다.
+Phase 2 완료 보고 후 멈추며 Phase 3 Teachable Machine Pose 연동을 시작하지 않는다.

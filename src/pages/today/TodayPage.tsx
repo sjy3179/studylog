@@ -10,7 +10,6 @@ import {
   Pause,
   PersonStanding,
   RotateCcw,
-  ScanFace,
   Sparkles,
   Square,
   SunMedium,
@@ -20,6 +19,7 @@ import {
 import { useSearchParams } from 'react-router-dom'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { CameraPanel } from '@/components/camera/CameraPanel'
 import {
   Accordion,
   AccordionContent,
@@ -180,7 +180,7 @@ export function TodayPage() {
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Badge variant="secondary">Phase 1</Badge>
+            <Badge variant="secondary">Phase 2</Badge>
             <Badge className="gap-1.5" variant="outline">
               <Sparkles aria-hidden="true" className="size-3.5 text-primary" />
               Mock 센서
@@ -342,28 +342,7 @@ export function TodayPage() {
             </Card>
           )}
 
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between gap-3">
-                <CardTitle className="text-base">카메라 미리보기</CardTitle>
-                <Badge variant="outline">Phase 2 예정</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="relative grid aspect-video min-h-64 place-items-center overflow-hidden rounded-2xl border bg-slate-950 text-white">
-                <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_center,rgba(129,140,248,.7)_0,transparent_55%)]" />
-                <div className="relative flex max-w-sm flex-col items-center px-6 text-center">
-                  <span className="grid size-16 place-items-center rounded-2xl border border-white/15 bg-white/10">
-                    <ScanFace aria-hidden="true" className="size-8 text-indigo-200" />
-                  </span>
-                  <p className="mt-4 font-medium">카메라 없이 Mock 모드로 실행 중</p>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-300">
-                    이번 Phase에서는 영상이나 이미지를 요청·저장·전송하지 않습니다.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <CameraPanel />
         </div>
 
         <aside className="min-w-0 space-y-6">
