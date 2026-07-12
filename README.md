@@ -125,4 +125,16 @@ AI 문제 해결:
 
 카메라 영상은 이후 Phase에서도 브라우저 안의 실시간 분석에만 사용하며 원본 영상과 이미지를 저장하거나 서버로 보내지 않습니다. studylog의 순공 시간은 실제 집중력을 측정한 값이 아니라 설정한 착석·자세·조도 조건을 충족한 시간입니다.
 
-전체 요구사항은 [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md), [PHASE_2_BRIEF.md](docs/PHASE_2_BRIEF.md), [PHASE_3_BRIEF.md](docs/PHASE_3_BRIEF.md), [PHASE_4_BRIEF.md](docs/PHASE_4_BRIEF.md), 반복 작업 규칙은 [AGENTS.md](AGENTS.md), 기술 결정은 [TECH_DECISIONS.md](docs/TECH_DECISIONS.md)를 참고하세요.
+## Phase 5 로컬 기록과 모델 평가
+
+- 세션 시작 시 `ACTIVE` 요약을 만들고 RUNNING 동안 1초마다 기존 `SessionTimer` 값을 기록합니다. PAUSED에서는 표본을 만들지 않습니다.
+- 정상 종료 시 `COMPLETED`, 새로고침 등으로 끊긴 기록은 다음 실행에서 `INTERRUPTED` 보관 또는 삭제를 선택합니다.
+- 기록 페이지는 기본적으로 AI 세션만 집계합니다. `데모 기록 포함`을 켜면 MOCK/MIXED 세션도 확인할 수 있습니다.
+- 상세 리포트에서 고정 스키마의 세션 표본 CSV와 요약 CSV를 받을 수 있습니다.
+- `/evaluate`는 3초 카운트다운 뒤 3초간 fresh TM Pose 결과를 수집하고 클래스별 평균 probability로 평가 결과를 저장합니다.
+- 학습 기록과 평가 결과는 `studylog-db` IndexedDB에만 저장됩니다. 브라우저 데이터를 삭제하면 함께 사라질 수 있습니다.
+- 저장 항목은 자세 상태, 확률, 편차 점수, 조도, 시간 통계입니다. 영상·사진·얼굴 이미지·원본 관절 좌표는 저장하거나 전송하지 않습니다.
+- 기록 및 평가 화면의 삭제 버튼으로 각 로컬 데이터를 지울 수 있습니다. 캘리브레이션과 일반 설정은 학습 기록 삭제 대상이 아닙니다.
+- Phase 6에서 CSV를 사용하는 Python 분석을 별도로 구현할 예정입니다.
+
+전체 요구사항은 [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md), [PHASE_2_BRIEF.md](docs/PHASE_2_BRIEF.md), [PHASE_3_BRIEF.md](docs/PHASE_3_BRIEF.md), [PHASE_4_BRIEF.md](docs/PHASE_4_BRIEF.md), [PHASE_5_BRIEF.md](docs/PHASE_5_BRIEF.md), 반복 작업 규칙은 [AGENTS.md](AGENTS.md), 기술 결정은 [TECH_DECISIONS.md](docs/TECH_DECISIONS.md)를 참고하세요.

@@ -4,6 +4,7 @@ import { Link, Outlet } from 'react-router-dom'
 import { BrandMark } from '@/components/brand/BrandMark'
 import { Button } from '@/components/ui/button'
 import { useSessionClock } from '@/hooks/useSessionClock'
+import { ActiveSessionRecovery } from '@/components/records/ActiveSessionRecovery'
 
 import { DesktopSidebar } from '../navigation/DesktopSidebar'
 import { MobileNavigation } from '../navigation/MobileNavigation'
@@ -13,6 +14,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-svh bg-background">
+      <ActiveSessionRecovery />
       <a
         className="sr-only z-50 rounded-lg bg-background px-4 py-3 text-sm font-semibold text-primary shadow-lg focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
         href="#app-main"

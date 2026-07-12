@@ -16,8 +16,8 @@ import {
   Target,
   TriangleAlert,
 } from 'lucide-react'
-import { useSearchParams } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useCallback, useEffect } from 'react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { CameraPanel } from '@/components/camera/CameraPanel'
@@ -41,6 +41,7 @@ import {
 import { Slider } from '@/components/ui/slider'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatDuration, formatMinutes } from '@/lib/format-duration'
+import { useSessionRecorder } from '@/hooks/useSessionRecorder'
 import { cn } from '@/lib/utils'
 import { getLuxStatus } from '@/sensors/LuxProvider'
 import { deriveStudyStatus } from '@/state/StudyStateMachine'
@@ -148,6 +149,9 @@ function TimerDetail({ label, value }: { label: string; value: number }) {
 }
 
 export function TodayPage() {
+  const navigate = useNavigate()
+  const handleRecordedFinish = useCallback((summary: { id: string }) => navigate(`/report/${summary.id}`), [navigate])
+  const recording = useSessionRecorder(handleRecordedFinish)
   const [searchParams] = useSearchParams()
   const lifecycle = useStudySessionStore((state) => state.lifecycle)
   const controlMode = useStudySessionStore((state) => state.controlMode)
@@ -217,6 +221,14 @@ export function TodayPage() {
           오늘 목표 {formatMinutes(goalMinutes)}
         </div>
       </header>
+
+      {recording.error ? (
+        <Alert className="mb-6 border-amber-200 bg-amber-50 text-amber-950">
+          <TriangleAlert aria-hidden="true" />
+          <AlertTitle>기록 저장에 문제가 있습니다.</AlertTitle>
+          <AlertDescription>{recording.error} 현재 타이머는 계속 동작합니다.</AlertDescription>
+        </Alert>
+      ) : null}
 
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.75fr)]">
         <div className="min-w-0 space-y-6">

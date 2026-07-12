@@ -36,6 +36,8 @@ export interface FusedPostureObservation {
   badReason: BadPostureReason | null
   tmLabel: TmPoseLabel | null
   tmConfidence: number | null
+  tmProbabilities?: Record<TmPoseLabel, number> | null
+  tmModelVersion?: string | null
   tmFresh: boolean
   poseDetected: boolean
   mediaPipeFresh: boolean

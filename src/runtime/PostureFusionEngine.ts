@@ -35,6 +35,8 @@ export class PostureFusionEngine {
       badReason: null,
       tmLabel: tmPrediction?.label ?? null,
       tmConfidence: tmPrediction?.confidence ?? null,
+      tmProbabilities: tmPrediction?.probabilities ?? null,
+      tmModelVersion: tmPrediction?.modelVersion ?? null,
       tmFresh,
       poseDetected: mediaPipeSignal?.poseDetected ?? false,
       mediaPipeFresh,

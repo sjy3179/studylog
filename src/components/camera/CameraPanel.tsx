@@ -7,7 +7,7 @@ import {
   ScanLine,
   Square,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { PosePresenceStatus } from '@/ai/pose-types'
@@ -28,6 +28,7 @@ import { useTeachableMachinePose } from '@/hooks/useTeachableMachinePose'
 import { useStudyRuntime } from '@/hooks/useStudyRuntime'
 import { cn } from '@/lib/utils'
 import { useStudySessionStore, useStudySettingsStore } from '@/stores/useStudyStore'
+import type { TmPoseRuntimeSnapshot } from '@/ai/tm-pose/tm-pose-types'
 
 const PRESENCE_COPY: Record<PosePresenceStatus, { label: string; className: string }> = {
   UNKNOWN: { label: '사람 확인 전', className: 'border-slate-200 bg-slate-50 text-slate-700' },
@@ -43,7 +44,9 @@ const ENGINE_ERROR_COPY = {
   INFERENCE_ERROR: '카메라 프레임을 분석하는 중 오류가 발생해 반복 추론을 중단했습니다.',
 } as const
 
-export function CameraPanel() {
+interface CameraPanelProps { onTmSnapshot?: (snapshot: TmPoseRuntimeSnapshot) => void }
+
+export function CameraPanel({ onTmSnapshot }: CameraPanelProps = {}) {
   const [collapsedOnMobile, setCollapsedOnMobile] = useState(false)
   const {
     devices,
@@ -79,6 +82,7 @@ export function CameraPanel() {
     poseSnapshot: runtime.snapshot,
     tmSnapshot: tmRuntime.snapshot,
   })
+  useEffect(() => { onTmSnapshot?.(tmRuntime.snapshot) }, [onTmSnapshot, tmRuntime.snapshot])
   const isCameraReady = cameraStatus === 'READY'
   const isCameraBusy = ['REQUESTING_PERMISSION', 'STARTING', 'STOPPING'].includes(cameraStatus)
   const engineReady = ['READY', 'RUNNING', 'PAUSED'].includes(runtime.snapshot.engineStatus)
