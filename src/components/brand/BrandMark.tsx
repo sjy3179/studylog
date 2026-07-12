@@ -22,8 +22,8 @@ export function BrandMark({ compact = false, className, to = '/' }: BrandMarkPro
         alt=""
         aria-hidden="true"
         className={cn(
-          'rounded-[30%] bg-white object-contain shadow-sm ring-1 ring-slate-200/70',
-          compact ? 'size-10' : 'size-12',
+          'h-auto object-contain',
+          compact ? 'w-24' : 'w-28 sm:w-[126px]',
         )}
         decoding="async"
         src="/studylog_logo.svg"
