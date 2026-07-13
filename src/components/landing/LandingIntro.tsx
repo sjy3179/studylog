@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const INTRO_STORAGE_KEY = 'studylog:landing-intro:v1'
-const EXIT_DELAY_MS = 1850
-const REMOVE_DELAY_MS = 2450
+const EXIT_DELAY_MS = 2250
+const REMOVE_DELAY_MS = 2850
 
 function hasSeenIntro(): boolean {
   try {
